@@ -6,6 +6,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +22,19 @@ void main() async {
     await File(sourceDbPath).copy(path);
   }
   
-  final db = await openDatabase(path);
+  final db = await openDatabase(
+    path,
+    version: 1,
+    onCreate: (Database db, int version) async {
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS oil_types (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          remaining_distance INTEGER NOT NULL
+        )
+      ''');
+    },
+  );
   
   runApp(
     MultiProvider(
@@ -40,17 +53,24 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ALKA Oil Tracker',
+      locale: const Locale('ar'),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('ar'),
+      ],
       theme: ThemeData(
         primarySwatch: Colors.blue,
         textTheme: GoogleFonts.cairoTextTheme(),
-        appBarTheme: AppBarTheme(
+        appBarTheme: const AppBarTheme(
           backgroundColor: Colors.blue,
           foregroundColor: Colors.white,
         ),
       ),
       home: const HomePage(),
-      locale: const Locale('ar', ''),
-      supportedLocales: const [Locale('ar', '')],
     );
   }
 }
@@ -77,17 +97,36 @@ class _HomePageState extends State<HomePage> {
           }
           
           final oilTypes = snapshot.data!;
+          if (oilTypes.isEmpty) {
+            return const Center(
+              child: Text(
+                'لا يوجد أنواع زيوت مضافة',
+                style: TextStyle(fontSize: 18),
+              ),
+            );
+          }
+          
           return ListView.builder(
             itemCount: oilTypes.length,
             itemBuilder: (context, index) {
               final oil = oilTypes[index];
-              return ListTile(
-                title: Text(oil['name']),
-                subtitle: Text('المسافة المتبقية: ${oil['remaining_distance']} كم'),
+              return Card(
+                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: ListTile(
+                  title: Text(oil['name']),
+                  subtitle: Text('المسافة المتبقية: ${oil['remaining_distance']} كم'),
+                  trailing: const Icon(Icons.arrow_forward_ios),
+                ),
               );
             },
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // TODO: Add new oil type
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }
