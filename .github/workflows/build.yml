@@ -7,6 +7,8 @@ on:
 
 env:
   FLUTTER_VERSION: 3.16.5
+  JAVA_VERSION: '17'
+  GRADLE_VERSION: '8.2'
 
 jobs:
   build:
@@ -19,7 +21,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: ${{ env.JAVA_VERSION }}
       
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -28,38 +30,29 @@ jobs:
           channel: 'stable'
           cache: true
       
-      - name: Create android directory structure
-        run: |
-          mkdir -p android/app/src/main/kotlin/com/alka/oiltracker
-          mkdir -p android/app/src/main/res/drawable
-          mkdir -p android/app/src/main/res/values
-          mkdir -p android/gradle/wrapper
-      
-      - name: Download Gradle Wrapper
-        run: |
-          cd android
-          wget -O gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/master/gradle/wrapper/gradle-wrapper.jar
-          wget -O gradlew https://raw.githubusercontent.com/gradle/gradle/master/gradlew
-          chmod +x gradlew
-          cd ..
-      
       - name: Install dependencies
         run: |
           flutter pub get
           flutter pub run flutter_launcher_icons
       
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: ${{ env.GRADLE_VERSION }}
+      
       - name: Create local.properties
         run: |
           echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
       
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: 8.2
+      - name: Grant execute permission for gradlew
+        run: |
+          cd android
+          chmod +x gradlew
       
       - name: Build APK
         run: |
           cd android
+          ./gradlew clean
           ./gradlew assembleRelease --stacktrace
           cd ..
       
@@ -67,4 +60,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+          path: android/app/build/outputs/apk/release/app-release.apk
