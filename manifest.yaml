@@ -1,15 +1,17 @@
-app_name: Oil Types
-short_name: OilTypes
+app_name: ALKA Oil Tracker
+short_name: ALKA Oil
 description: Oil Types Management Application
 version: 1.0.0
 build_number: 1
-package_name: com.oiltypes.app
+package_name: com.alka.oiltracker
 platforms:
   android:
-    package_name: com.oiltypes.app
+    package_name: com.alka.oiltracker
     version_name: 1.0.0
     version_code: 1
     min_sdk_version: 21
     target_sdk_version: 33
     permissions:
       - android.permission.INTERNET
+      - android.permission.WRITE_EXTERNAL_STORAGE
+      - android.permission.READ_EXTERNAL_STORAGE
