@@ -15,24 +15,36 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: 'stable'
           cache: true
-          
+      
       - name: Install dependencies
         run: |
           flutter pub get
           flutter pub run flutter_launcher_icons
-          
+      
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      
       - name: Build APK
         run: |
-          flutter build apk --release
-          
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease
+          cd ..
+      
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: build/app/outputs/apk/release/app-release.apk
