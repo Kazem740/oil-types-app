@@ -31,7 +31,7 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
     namespace "com.alka.oiltracker"
-    compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion 34
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -49,8 +49,8 @@ android {
 
     defaultConfig {
         applicationId "com.alka.oiltracker"
-        minSdkVersion flutter.minSdkVersion
-        targetSdkVersion flutter.targetSdkVersion
+        minSdkVersion 21
+        targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
@@ -60,7 +60,17 @@ android {
             signingConfig signingConfigs.debug
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            ndk {
+                debugSymbolLevel 'SYMBOL_TABLE'
+            }
         }
+        debug {
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    lint {
+        disable 'InvalidPackage'
     }
 }
 
@@ -70,4 +80,6 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation 'androidx.window:window:1.0.0'
+    implementation 'androidx.window:window-java:1.0.0'
 }
