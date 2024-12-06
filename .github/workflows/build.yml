@@ -22,6 +22,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: ${{ env.JAVA_VERSION }}
+          cache: 'gradle'
       
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -32,6 +33,7 @@ jobs:
       
       - name: Install dependencies
         run: |
+          flutter clean
           flutter pub get
           flutter pub run flutter_launcher_icons
       
@@ -43,18 +45,22 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
+          gradle-home-cache-cleanup: true
+      
+      - name: Clean Gradle
+        working-directory: android
+        run: ./gradlew clean
       
       - name: Grant execute permission for gradlew
-        run: |
-          cd android
-          chmod +x gradlew
+        working-directory: android
+        run: chmod +x gradlew
       
-      - name: Build APK
+      - name: Build Debug APK
         run: |
-          flutter build apk --release
+          flutter build apk --debug --verbose
       
-      - name: Upload APK
+      - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release
-          path: build/app/outputs/apk/release/app-release.apk
+          name: app-debug
+          path: build/app/outputs/flutter-apk/app-debug.apk
