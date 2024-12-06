@@ -28,6 +28,21 @@ jobs:
           channel: 'stable'
           cache: true
       
+      - name: Create android directory structure
+        run: |
+          mkdir -p android/app/src/main/kotlin/com/alka/oiltracker
+          mkdir -p android/app/src/main/res/drawable
+          mkdir -p android/app/src/main/res/values
+          mkdir -p android/gradle/wrapper
+      
+      - name: Download Gradle Wrapper
+        run: |
+          cd android
+          wget -O gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/master/gradle/wrapper/gradle-wrapper.jar
+          wget -O gradlew https://raw.githubusercontent.com/gradle/gradle/master/gradlew
+          chmod +x gradlew
+          cd ..
+      
       - name: Install dependencies
         run: |
           flutter pub get
@@ -39,7 +54,6 @@ jobs:
       - name: Build APK
         run: |
           cd android
-          chmod +x gradlew
           ./gradlew assembleRelease
           cd ..
       
@@ -47,4 +61,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: build/app/outputs/apk/release/app-release.apk
+          path: android/app/build/outputs/apk/release/app-release.apk
