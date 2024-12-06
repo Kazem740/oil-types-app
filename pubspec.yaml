@@ -1,5 +1,5 @@
-name: oil_types_app
-description: Oil Types Management Application
+name: alka_oil_tracker
+description: ALKA Oil Types Management Application
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -11,6 +11,9 @@ dependencies:
     sdk: flutter
   flet: ^0.21.0
   cupertino_icons: ^1.0.2
+  path_provider: ^2.0.15
+  sqflite: ^2.3.0
+  intl: ^0.18.0
 
 dev_dependencies:
   flutter_test:
@@ -21,3 +24,9 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700
